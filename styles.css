@@ -1,0 +1,81 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .nav-item:hover {
+    background-color: #343a40;
+  }
+  
+  .main-content {
+    background-color: #dbdbdb;
+    min-height: 100vh;
+  }
+  
+  .sidebar {
+    width: 70px;
+    min-height: 100vh;
+  }
+  
+  .nav-icon {
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .nav-icon:hover {
+    background-color: #343a40;
+    border-radius: 8px;
+  }
+  
+  .status-buttons .status-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .status-circle .label {
+    font-size: 14px;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  .product-list {
+    max-height: 400px;
+  }
+  
+  .product-card {
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+    border-radius: 0.5rem;
+  }
+  
+  .product-card.selected {
+    background-color: #fd7e14 !important; /* Laranja */
+  }
+  
+  .product-card img {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    height: 120px;
+    object-fit: cover;
+    width: 100%;
+  }
+  
+  .card-body {
+    padding: 0.5rem 1rem;
+  }
+  
+  
