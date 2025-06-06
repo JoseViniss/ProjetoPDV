@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDV FOOD</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-light bg-white px-3 shadow-sm">
+    <span class="navbar-brand mb-0 h1 text-primary">PDV FOOD</span>
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-bell-fill text-primary fs-5"></i>
+      <img src="https://via.placeholder.com/32" class="rounded-circle" alt="Usuário">
+    </div>
+  </nav>
+
+  <div class="d-flex main-container">
+    <div class="sidebar bg-dark text-white d-flex flex-column align-items-center py-4">
+      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-house-door-fill"></i></div>
+      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-card-list"></i></div>
+      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-box-seam"></i></div>
+      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-gear-fill"></i></div>
+    </div>
+  
+    <main class="main-content bg-light flex-grow-1 p-4 d-flex gap-3">
+      <section class="left-panel w-50 d-flex flex-column">
+        <div class="status-buttons d-flex justify-content-between mb-3">
+          <div class="status-circle bg-primary text-white"><i class="bi bi-list"></i></div>
+          <div class="status-circle bg-warning text-dark"><i class="bi bi-star"></i></div>
+          <div class="status-circle bg-success text-white"><i class="bi bi-check-circle"></i></div>
+          <div class="status-circle bg-danger text-white"><i class="bi bi-x-circle"></i></div>
+        </div>
+
+        <div class="input-group mb-3 shadow-sm">
+            <input type="text" class="form-control" placeholder="Buscar produto por nome..." id="searchInput">
+            <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+        </div>
+
+        <div class="product-list-wrapper bg-white p-3 rounded shadow-sm mb-3 flex-grow-1 overflow-hidden d-flex flex-column">
+            <div id="productContainer" class="row g-3 overflow-auto h-100">
+                </div>
+        </div>
+        
+        <nav aria-label="Product navigation" class="mt-auto pt-2">
+            <ul class="pagination justify-content-center" id="paginationControls">
+                </ul>
+        </nav>
+
+        <div class="add-to-order-section bg-white p-3 rounded shadow-sm mt-3">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <label for="itemQuantity" class="form-label fw-bold">Quantidade:</label>
+                    <div class="input-group">
+                         <button class="btn btn-outline-secondary btn-sm" type="button" id="decreaseQuantity"><i class="bi bi-dash-lg"></i></button>
+                         <input type="number" class="form-control form-control-sm text-center fw-bold" id="itemQuantity" value="1" min="1" aria-label="Quantidade">
+                         <button class="btn btn-outline-secondary btn-sm" type="button" id="increaseQuantity"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-7 mt-3 mt-md-0 text-end">
+                    <button class="btn btn-primary fw-bold w-100 py-2" id="btnAddSelectedItemToOrder">Adicionar Item Selecionado</button>
+                </div>
+            </div>
+        </div>
+      </section>
+  
+      <section class="right-panel w-50 d-flex flex-column">
+        <div class="customer-section bg-white p-3 rounded shadow-sm mb-3">
+          <h6 class="mb-2 fw-bold text-primary">Cliente</h6>
+          <div class="input-group">
+            <select class="form-select" id="selectCliente">
+              <option selected value="0">Consumidor Final</option>
+              <option value="1">Cliente Exemplo 1 (João)</option>
+            </select>
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addClientModal" title="Cadastrar Novo Cliente">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+        </div>
+      
+        <div class="product-code-section bg-white p-3 rounded shadow-sm mb-3">
+          <h6 class="mb-2 fw-bold text-primary">Adicionar por Código</h6>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Digitar código do produto" id="inputCodigoProduto">
+            <button class="btn btn-secondary" type="button" id="btnAddByCode">
+                <i class="bi bi-arrow-return-left"></i> Adicionar
+            </button>
+          </div>
+        </div>
+      
+        <div class="order-section bg-white p-3 rounded shadow-sm mb-3 flex-grow-1 d-flex flex-column overflow-hidden">
+          <h5 class="mb-3 fw-bold text-primary text-center">Comanda</h5>
+          <div class="table-responsive flex-grow-1" style="min-height: 200px;">
+            <table class="table table-sm table-striped table-hover" id="orderTable">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Produto</th><th scope="col" class="text-end">Preço</th><th scope="col" class="text-center">Qtd</th><th scope="col" class="text-end">Subtotal</th><th scope="col" class="text-center">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="orderTableBody"></tbody>
+            </table>
+          </div>
+          <div class="order-summary mt-auto pt-3 border-top">
+             <div class="d-flex justify-content-between mb-1"><span>Itens na comanda:</span><span class="fw-bold" id="totalItemsCount">0</span></div>
+             <div class="d-flex justify-content-between mb-1"><span>Subtotal Pedido:</span><span class="fw-bold" id="orderSubtotal">R$ 0,00</span></div>
+             <div class="d-flex justify-content-between align-items-center mb-2"><label for="discountInput" class="form-label fw-medium mb-0">Desconto (%):</label><input type="number" class="form-control form-control-sm text-end" style="width: 80px;" id="discountInput" value="0" min="0" max="100"></div>
+             <hr class="my-2">
+             <div class="d-flex justify-content-between fw-bold fs-5 text-success"><span>Total a Pagar:</span><span id="totalPayable">R$ 0,00</span></div>
+          </div>
+        </div>
+      
+        <div class="order-actions d-flex gap-2 mt-auto">
+          <button class="btn btn-outline-danger w-50 py-2 fw-medium" id="btnCancelOrder"><i class="bi bi-x-circle"></i> Cancelar Pedido</button>
+          <button class="btn btn-success w-50 py-2 fw-medium" id="btnGoToPayment" data-bs-toggle="modal" data-bs-target="#paymentModal"><i class="bi bi-cash-coin"></i> Forma de Pagamento</button>
+        </div>
+      </section>
+    </main>   
+  </div>
+
+  <div class="modal fade" id="addClientModal" tabindex="-1">
+    </div>
+  
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Forma de Pagamento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="total-to-pay mb-3 text-center">
+                <span class="text-muted">TOTAL A PAGAR</span>
+                <h2 class="fw-bold text-success" id="paymentModalTotal">R$ 0,00</h2>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Selecione o método:</label>
+                <div class="d-grid gap-2">
+                    <input type="radio" class="btn-check" name="paymentMethod" id="payDinheiro" value="dinheiro" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="payDinheiro"><i class="bi bi-cash-stack"></i> Dinheiro</label>
+                    <input type="radio" class="btn-check" name="paymentMethod" id="payCredito" value="credito" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="payCredito"><i class="bi bi-credit-card-2-front"></i> Cartão de Crédito</label>
+                    <input type="radio" class="btn-check" name="paymentMethod" id="payDebito" value="debito" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="payDebito"><i class="bi bi-credit-card"></i> Cartão de Débito</label>
+                    <input type="radio" class="btn-check" name="paymentMethod" id="payPix" value="pix" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="payPix"><i class="bi bi-qr-code"></i> PIX</label>
+                </div>
+            </div>
+            <div id="cashPaymentDetails" class="mt-4 p-3 border rounded bg-light" style="display: none;">
+                <div class="mb-3">
+                    <label for="valorRecebido" class="form-label fw-medium">Valor Recebido:</label>
+                    <input type="number" class="form-control form-control-lg text-end" id="valorRecebido" placeholder="0,00">
+                </div>
+                <div class="text-center">
+                    <span class="text-muted">TROCO</span>
+                    <h3 class="fw-bold text-info" id="trocoCalculado">R$ 0,00</h3>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+          <button type="button" class="btn btn-success" id="btnFinalizarVenda"><i class="bi bi-check2-circle"></i> Finalizar Venda</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="script.js"></script>
+</body>
+</html>

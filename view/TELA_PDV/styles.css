@@ -1,0 +1,137 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.main-container {
+  height: calc(100vh - 56px);
+}
+.main-content {
+  background-color: #f0f2f5;
+}
+.sidebar {
+  width: 70px;
+  background-color: #1c2127 !important;
+}
+.nav-icon i {
+  color: #8e9aa6;
+}
+.nav-icon:hover i {
+  color: #fff;
+}
+.nav-icon:hover {
+  background-color: #343a40;
+}
+
+/* Estilos para os botões de status (RESTAURADOS) */
+.status-buttons .status-circle {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.status-buttons .status-circle:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Scrollbars */
+#productContainer::-webkit-scrollbar { width: 8px; }
+#productContainer::-webkit-scrollbar-track { background: #f0f2f5; }
+#productContainer::-webkit-scrollbar-thumb { background-color: #0d6efd; border-radius: 10px; border: 2px solid #f0f2f5; }
+
+/* Cards de produto */
+.product-card {
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.3rem 0.8rem rgba(0, 0, 0, 0.08);
+  border-color: #b9c5d2;
+}
+.product-card.selected {
+  border-color: #0d6efd; 
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.35);
+  background-color: #f2f7ff;
+}
+.product-card .card-img-top {
+  border-top-left-radius: calc(0.5rem - 1px); 
+  border-top-right-radius: calc(0.5rem - 1px);
+  height: 130px; 
+  object-fit: cover;
+}
+.product-card .card-body {
+  padding: 0.75rem; 
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
+}
+.product-card .product-name {
+  font-size: 0.9rem; 
+  font-weight: 600; 
+  color: #343a40; 
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+  min-height: 2.4em; 
+  flex-grow: 1; 
+}
+.product-card .product-price {
+  font-size: 1rem; 
+  font-weight: 700; 
+  color: #0d6efd; 
+  margin-top: auto; 
+}
+
+/* Modal de Pagamento */
+#paymentModal .btn-check:checked+.btn-outline-primary {
+    background-color: #0d6efd;
+    color: #fff;
+}
+#paymentModal .btn-outline-primary {
+    text-align: left;
+    padding-left: 1.5rem;
+}
+#valorRecebido {
+  -moz-appearance: textfield;
+}
+#valorRecebido::-webkit-outer-spin-button,
+#valorRecebido::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Outros ajustes */
+.left-panel, .right-panel {
+    max-height: calc(100vh - 56px - 2rem);
+    overflow-y: hidden;
+}
+.product-list-wrapper {
+    min-height: 300px;
+}
+
+/* Adicione esta classe ao final do seu CSS */
+
+/* Estilo para o campo de quantidade na tabela da comanda */
+/* Verifique se esta classe está no seu styles.css */
+
+.quantity-input-comanda {
+    width: 65px;
+    text-align: center;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+}

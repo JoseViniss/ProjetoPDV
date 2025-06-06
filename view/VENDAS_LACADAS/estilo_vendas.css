@@ -1,0 +1,39 @@
+.main-container {
+  height: calc(100vh - 56px);
+}
+.main-content {
+  background-color: #f0f2f5;
+}
+
+.action-btn {
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.details-row {
+  background-color: #f8f9fa;
+}
+
+.details-table td {
+  padding: 0.25rem 0.5rem;
+  font-size: 14px;
+}
+
+.sidebar {
+  width: 70px;
+  background-color: #1c2127 !important;
+}
+.nav-icon i {
+  color: #8e9aa6;
+}
+.nav-icon:hover i {
+  color: #fff;
+}
+.nav-icon:hover {
+  background-color: #343a40;
+}
