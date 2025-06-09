@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,77 +9,50 @@
   <link rel="stylesheet" th:href="@{/css/styles.css}" />
   <script>
     function limpa_formulario_cep() {
-              //Limpa valores do formulário de cep.
-              document.getElementById('rua').value=("");
-              document.getElementById('bairro').value=("");
-              document.getElementById('cidade').value=("");
-              document.getElementById('uf').value=("");
-      }
+        document.getElementById('rua').value=("");
+        document.getElementById('bairro').value=("");
+        document.getElementById('cidade').value=("");
+        document.getElementById('uf').value=("");
+    }
 
-      function meu_callback(conteudo) {
-          if (!("erro" in conteudo)) {
-              //Atualiza os campos com os valores.
-              document.getElementById('rua').value=(conteudo.logradouro);
-              document.getElementById('bairro').value=(conteudo.bairro);
-              document.getElementById('cidade').value=(conteudo.localidade);
-              document.getElementById('uf').value=(conteudo.uf);
-          } //end if.
-          else {
-              //CEP não Encontrado.
-              limpa_formulário_cep();
-              alert("CEP não encontrado.");
-          }
-      }
-          
-      function pesquisacep(valor) {
-
-          //Nova variável "cep" somente com dígitos.
-          var cep = valor.replace(/\D/g, '');
-
-          //Verifica se campo cep possui valor informado.
-          if (cep != "") {
-
-              //Expressão regular para validar o CEP.
-              var validacep = /^[0-9]{8}$/;
-
-              //Valida o formato do CEP.
-              if(validacep.test(cep)) {
-
-                  //Preenche os campos com "..." enquanto consulta webservice.
-                  document.getElementById('rua').value="...";
-                  document.getElementById('bairro').value="...";
-                  document.getElementById('cidade').value="...";
-                  document.getElementById('uf').value="...";
-
-                  //Cria um elemento javascript.
-                  var script = document.createElement('script');
-
-                  //Sincroniza com o callback.
-                  script.src = 'https://viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
-
-                  //Insere script no documento e carrega o conteúdo.
-                  document.body.appendChild(script);
-
-              } //end if.
-              else {
-                  //cep é inválido.
-                  limpa_formulario_cep();
-                  alert("Formato de CEP inválido.");
-              }
-          } //end if.
-          else {
-              //cep sem valor, limpa formulário.
-              limpa_formulario_cep();
-          }
-      };
+    function meu_callback(conteudo) {
+        if (!("erro" in conteudo)) {
+            document.getElementById('rua').value=(conteudo.logradouro);
+            document.getElementById('bairro').value=(conteudo.bairro);
+            document.getElementById('cidade').value=(conteudo.localidade);
+            document.getElementById('uf').value=(conteudo.uf);
+        } else {
+            limpa_formulario_cep();
+            alert("CEP não encontrado.");
+        }
+    }
+        
+    function pesquisacep(valor) {
+        var cep = valor.replace(/\D/g, '');
+        if (cep != "") {
+            var validacep = /^[0-9]{8}$/;
+            if(validacep.test(cep)) {
+                document.getElementById('rua').value="...";
+                document.getElementById('bairro').value="...";
+                document.getElementById('cidade').value="...";
+                document.getElementById('uf').value="...";
+                var script = document.createElement('script');
+                script.src = 'https://viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
+                document.body.appendChild(script);
+            } else {
+                limpa_formulario_cep();
+                alert("Formato de CEP inválido.");
+            }
+        } else {
+            limpa_formulario_cep();
+        }
+    };
   </script>
-
 </head>
 <body>
   <nav class="navbar navbar-light bg-white px-3 shadow-sm">
-    <span class="navbar-brand mb-0 h1 text-primary">PDV FOOD</span>
+    <a href="/" class="link-offset-2 link-underline link-underline-opacity-0"><span class="navbar-brand mb-0 h1 text-primary"><strong>PDV FOOD</strong></span></a>
     <div class="d-flex align-items-center gap-3 dropstart">
-      
       <img th:src="${imagem}" class="usuario_imagem rounded-circle" alt="Usuário"  type="button" data-bs-toggle="dropdown" aria-expanded="false">
 	  	<ul class="dropdown-menu">
 	      <li><a class="dropdown-item" href="/sair">Sair</a></li>
@@ -90,37 +63,25 @@
 
   <div class="d-flex main-container">
     <div class="sidebar bg-dark text-white d-flex flex-column align-items-center py-4">
-      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-house-door-fill"></i></div>
+      <a href="/"><div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-house-door-fill"></i></div></a>
       <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-card-list"></i></div>
-      <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-box-seam"></i></div>
+      <a href="/cadastro/produto"><div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-box-seam"></i></div></a>
       <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-gear-fill"></i></div>
     </div>
   
     <main class="main-content bg-light flex-grow-1 p-4 d-flex gap-3">
       <section class="left-panel w-50 d-flex flex-column">
-        <div class="status-buttons d-flex justify-content-between mb-3">
-          <div class="status-circle bg-primary text-white"><i class="bi bi-list"></i></div>
-          <div class="status-circle bg-warning text-dark"><i class="bi bi-star"></i></div>
-          <div class="status-circle bg-success text-white"><i class="bi bi-check-circle"></i></div>
-          <div class="status-circle bg-danger text-white"><i class="bi bi-x-circle"></i></div>
-        </div>
-
         <div class="input-group mb-3 shadow-sm">
             <input type="text" class="form-control" placeholder="Buscar produto por nome..." id="searchInput">
             <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
         </div>
-
         <div class="product-list-wrapper bg-white p-3 rounded shadow-sm mb-3 flex-grow-1 overflow-hidden d-flex flex-column">
-            <div id="productContainer" class="row g-3 overflow-auto h-100">
-                </div>
+            <div id="productContainer" class="row g-3 overflow-auto h-100"></div>
         </div>
-        
         <nav aria-label="Product navigation" class="mt-auto pt-2">
-            <ul class="pagination justify-content-center" id="paginationControls">
-                </ul>
+            <ul class="pagination justify-content-center" id="paginationControls"></ul>
         </nav>
-
-        <div class="add-to-order-section bg-white p-3 rounded shadow-sm mt-3">
+        <div class="add-to-order-section bg-white p-3 rounded shadow-sm mt-1">
             <div class="row align-items-center">
                 <div class="col-md-5">
                     <label for="itemQuantity" class="form-label fw-bold">Quantidade:</label>
@@ -130,7 +91,7 @@
                          <button class="btn btn-outline-secondary btn-sm" type="button" id="increaseQuantity"><i class="bi bi-plus-lg"></i></button>
                     </div>
                 </div>
-                <div class="col-md-7 mt-3 mt-md-0 text-end">
+                <div class="col-md-7 text-end">
                     <button class="btn btn-primary fw-bold w-100 py-2" id="btnAddSelectedItemToOrder">Adicionar Item Selecionado</button>
                 </div>
             </div>
@@ -138,12 +99,13 @@
       </section>
   
       <section class="right-panel w-50 d-flex flex-column">
+        
         <div class="customer-section bg-white p-3 rounded shadow-sm mb-3">
           <h6 class="mb-2 fw-bold text-primary">Cliente</h6>
           <div class="input-group">
-            <select class="form-select" id="selectCliente">
-              <option selected value="0">Consumidor Final</option>
-              <option value="1">Cliente Exemplo 1 (João)</option>
+            <select class="form-select" id="selectCliente" name="clienteId">
+              <option value="0" selected>Consumidor Final</option>
+              <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nome}"></option>
             </select>
             <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addClientModal" title="Cadastrar Novo Cliente">
               <i class="bi bi-plus-lg"></i>
@@ -193,59 +155,57 @@
   <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addClientModalLabel">Cadastrar Novo Cliente</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <form th:action="@{/save/cliente}" method="post" th:object="${cliente}" id="formAddClient">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addClientModalLabel">Cadastrar Novo Cliente</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                <label for="nome" class="form-label">Nome Completo <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" th:field="*{nome}" required>
+              </div>
+              <div class="row">
+                  <div class="col-md-6 mb-3">
+                      <label for="telefone" class="form-label">Telefone / Celular</label>
+                      <input type="tel" class="form-control" th:field="*{telefone}" placeholder="(XX) XXXXX-XXXX">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" th:field="*{email}">
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4 mb-3">
+                      <label class="form-label">CEP</label>
+                      <input type="text" class="form-control" th:field="*{cep}" size="10" maxlength="9" onblur="pesquisacep(this.value);">
+                  </div>
+                   <div class="col-md-8 mb-3">
+                      <label class="form-label">Endereço (Rua, Av...)</label>
+                      <input class="form-control" type="text" th:field="*{rua}">
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4 mb-3">
+                      <label class="form-label">Bairro</label>
+                      <input class="form-control" type="text" th:field="*{bairro}">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                      <label class="form-label">Cidade</label>
+                      <input type="text" class="form-control" th:field="*{cidade}">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                      <label class="form-label">Estado (UF)</label>
+                      <input type="text" class="form-control" th:field="*{uf}" size="2">
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+          </div>
+        </form>
         </div>
-        <div class="modal-body">
-          <form id="formAddClient">
-            <div class="mb-3">
-              <label for="clientName" class="form-label">Nome Completo <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" id="clientName" required>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="clientPhone" class="form-label">Telefone / Celular</label>
-                    <input type="tel" class="form-control" id="clientPhone" placeholder="(XX) XXXXX-XXXX">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="clientEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="clientEmail">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="clientCity" class="form-label">CEP</label>
-                    <input type="text" class="form-control" name="cep" id="cep" value="" size="10" maxlength="9" onblur="pesquisacep(this.value);" /></label>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="clientState" class="form-label">Estado</label>
-                    <input type="text" class="form-control" name="uf" id="uf" size="2">
-                </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="clientAddress" class="form-label">Endereço</label>
-              <input class="form-control" name="rua" type="text" id="rua">
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="clientCity" class="form-label">Cidade</label>
-                    <input type="text" class="form-control" name="cidade" id="cidade" size="40">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="clientState" class="form-label">Bairro</label>
-                    <input class="form-control" name="bairro" type="text" id="bairro" size="40">
-                </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="btnSaveClient">Salvar Cliente</button>
-        </div>
-      </div>
     </div>
   </div>
   
@@ -293,8 +253,13 @@
       </div>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	
+  <script th:inline="javascript">
+        /*<![CDATA[*/
+        const initialProducts = /*[[${produtos}]]*/ [];
+        /*]]>*/
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>  
   <script th:src="@{/js/script.js}" defer></script>
 </body>
 </html>

@@ -1,19 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // A lista `initialProducts` permanece a mesma de antes.
-    const initialProducts = [
-        { id: 1, name: "Pizza Calabresa Especial da Casa", price: 39.90, img: "https://media.istockphoto.com/id/1469855262/pt/foto/sliced-pepperoni-pizza-on-wooden-board-on-concrete-table-top-view.jpg?s=612x612&w=0&k=20&c=FpfjWJHbVogm9qaODxCTr_ivBYa--f_qShLRrdPYikk=", code: "P001" },
-        { id: 2, name: "Pizza Portuguesa Clássica", price: 42.90, img: "https://as1.ftcdn.net/jpg/04/79/24/34/1000_F_479243487_FFjhZmUNfHKPAtf8A9Pu3trhzjtJd3VS.jpg", code: "P002" },
-        { id: 3, name: "Hambúrguer Super Bacon Artesanal", price: 29.90, img: "https://st2.depositphotos.com/3957801/5642/i/450/depositphotos_56423065-stock-photo-bacon-burger.jpg", code: "H001" },
-        { id: 4, name: "Hambúrguer Duplo Cheddar Monstro", price: 32.90, img: "https://source.unsplash.com/400x300/?double,burger", code: "H002" },
-        { id: 5, name: "Refrigerante Cola Geladíssimo 350ml", price: 6.00, img: "https://source.unsplash.com/400x300/?soda,coke", code: "B001" },
-        { id: 6, name: "Refrigerante Guaraná Amazônico Puro", price: 6.00, img: "https://source.unsplash.com/400x300/?guarana", code: "B002" },
-        { id: 7, name: "Batata Frita Crocante Média", price: 15.00, img: "https://source.unsplash.com/400x300/?french,fries", code: "A001" },
-        { id: 8, name: "Suco de Laranja Natural 500ml", price: 9.50, img: "https://source.unsplash.com/400x300/?orange,juice", code: "B003" },
-        { id: 9, name: "Pizza Margherita Individual", price: 35.00, img: "https://source.unsplash.com/400x300/?margherita,pizza", code: "P003" },
-        { id: 10, name: "Água Mineral Sem Gás 500ml", price: 4.00, img: "https://source.unsplash.com/400x300/?water,bottle", code: "B004" },
-        { id: 11, name: "Brownie de Chocolate com Nozes", price: 12.00, img: "https://source.unsplash.com/400x300/?chocolate,brownie", code: "S001" },
-        { id: 12, name: "Salada Caesar com Frango Grelhado", price: 25.00, img: "https://source.unsplash.com/400x300/?caesar,salad", code: "L001" },
-    ];
+	
     let currentProducts = [...initialProducts];
     let selectedProduct = null;
     let orderItems = [];
@@ -46,13 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const trocoCalculadoEl = document.getElementById('trocoCalculado');
     const btnFinalizarVenda = document.getElementById('btnFinalizarVenda');
 
+
     function formatCurrency(value) {
         return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    // Todas as funções de renderização de produtos, paginação e adição de itens
-    // permanecem as mesmas da versão anterior. Nenhuma alteração necessária nelas.
-    // ... (copie e cole todas as funções de `renderProducts` até `updateOrderSummary` aqui)
     function renderProducts() {
         productContainer.innerHTML = "";
         selectedProduct = null;
@@ -69,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement("div");
             card.className = "card product-card";
             card.dataset.productId = prod.id;
-            card.innerHTML = `<img src="${prod.img}" class="card-img-top" alt="${prod.name}"><div class="card-body"><h5 class="product-name">${prod.id} - ${prod.name}</h5><p class="product-price">${formatCurrency(prod.price)}</p></div>`;
+            card.innerHTML = `<img src="${prod.imagem_produto}" class="card-img-top" alt="${prod.nome}"><div class="card-body"><h5 class="product-name">${prod.id} - ${prod.nome}</h5><p class="product-price">${formatCurrency(prod.valor_venda)}</p></div>`;
             card.addEventListener("click", () => {
                 const currentlySelectedCard = productContainer.querySelector('.product-card.selected');
                 if (currentlySelectedCard) currentlySelectedCard.classList.remove('selected');
@@ -127,29 +111,24 @@ document.addEventListener('DOMContentLoaded', () => {
         updateOrderSummary();
     }
 
-    // No seu arquivo script.js, substitua a função renderOrderTable por esta:
+	function renderOrderTable() {
+    orderTableBody.innerHTML = "";
 
-// No seu arquivo script.js, SUBSTITUA a função renderOrderTable inteira por esta:
-
-function renderOrderTable() {
-    orderTableBody.innerHTML = ""; // Limpa a tabela atual
-
-    // Se a comanda estiver vazia, mostra a mensagem padrão
     if (orderItems.length === 0) {
         orderTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-4">Nenhum item na comanda.</td></tr>`;
-        updateOrderSummary(); // Garante que o resumo de totais seja zerado
+        updateOrderSummary(); 
         return;
     }
 
     // Cria uma linha para cada item na comanda
     orderItems.forEach((item, index) => {
-        const subtotal = item.price * item.quantity;
+        const subtotal = item.valor_venda * item.quantity;
         const row = orderTableBody.insertRow();
         
         // Esta é a parte que cria o HTML da linha, incluindo o campo de input
         row.innerHTML = `
-            <td>${item.name}</td>
-            <td class="text-end">${formatCurrency(item.price)}</td>
+            <td>${item.nome}</td>
+            <td class="text-end">${formatCurrency(item.valor_venda)}</td>
             <td class="text-center">
                 <input 
                     type="number" 
@@ -191,7 +170,7 @@ function renderOrderTable() {
             orderItems[index].quantity = newQuantity;
 
             const item = orderItems[index];
-            const newSubtotal = item.price * newQuantity;
+            const newSubtotal = item.valor_venda * newQuantity;
             const row = this.closest('tr');
             const subtotalCell = row.querySelector('.subtotal-cell');
             subtotalCell.textContent = formatCurrency(newSubtotal);
@@ -206,7 +185,7 @@ function renderOrderTable() {
         let subtotal = 0;
         orderItems.forEach(item => {
             itemsCount += item.quantity;
-            subtotal += item.price * item.quantity;
+            subtotal += item.valor_venda * item.quantity;
         });
         const discountPercent = parseFloat(discountInput.value) || 0;
         const discountAmount = (subtotal * discountPercent) / 100;
@@ -294,29 +273,52 @@ function renderOrderTable() {
 
     // Modal Cliente
 
-    const btnSaveClient = document.getElementById('btnSaveClient');
-    if (btnSaveClient) {
-        btnSaveClient.addEventListener('click', () => {
-            // Lógica para salvar cliente (mock)
-            const clientName = document.getElementById('clientName').value;
-            if (clientName.trim() === "") {
-                alert("O nome do cliente é obrigatório.");
-                return;
-            }
-            alert(`Cliente "${clientName}" salvo com sucesso! (Simulação)`);
-            
-            // Adicionar cliente ao select (exemplo)
-            const selectCliente = document.getElementById('selectCliente');
-            const newOption = new Option(clientName, `new_${clientName.replace(/\s+/g, '_')}`, false, true);
-            selectCliente.add(newOption);
-            selectCliente.value = newOption.value; // Seleciona o novo cliente
+		formAddClient.addEventListener('submit', (event) => {
+		    event.preventDefault(); // ESSENCIAL: Impede o envio padrão do formulário
 
-            // Fechar modal
-            const clientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
-            clientModal.hide();
-            document.getElementById('formAddClient').reset(); // Limpa o formulário do modal
-        });
-    }
+		    // Monta o objeto com os dados do cliente
+		    const clienteData = {
+		        nome: document.getElementById('nome').value,
+		        telefone: document.getElementById('telefone').value,
+		        email: document.getElementById('email').value,
+		        cep: document.getElementById('cep').value,
+		        rua: document.getElementById('rua').value,
+		        bairro: document.getElementById('bairro').value,
+		        cidade: document.getElementById('cidade').value,
+		        uf: document.getElementById('uf').value
+		    };
+
+		    // Lógica do fetch para a API
+		    fetch('/save/cliente', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json',
+		        },
+		        body: JSON.stringify(clienteData),
+		    })
+		    .then(response => {
+		        if (!response.ok) {
+		            throw new Error('Falha na resposta da rede: ' + response.statusText);
+		        }
+		        return response.json();
+		    })
+		    .then(novoCliente => {
+		        // Sucesso!
+		        const newOption = new Option(novoCliente.nome, novoCliente.id, false, true);
+		        selectCliente.add(newOption);
+		        selectCliente.value = novoCliente.id;
+
+		        const clientModal = bootstrap.Modal.getInstance(addClientModal);
+		        clientModal.hide();
+		        formAddClient.reset();
+		        alert('Cliente cadastrado com sucesso via AJAX!');
+		    })
+		    .catch(error => {
+		        console.error('Erro ao cadastrar cliente:', error);
+		        alert('Ocorreu um erro ao cadastrar o cliente. Verifique o console para mais detalhes.');
+		    });
+		});
+
 
     function resetApplicationState() {
         // Fecha o modal de pagamento
@@ -342,7 +344,7 @@ function renderOrderTable() {
     // --- EVENT LISTENERS GERAIS (sem alterações) ---
     searchInput.addEventListener('keyup', () => {
         const searchTerm = searchInput.value.toLowerCase();
-        currentProducts = initialProducts.filter(prod => prod.name.toLowerCase().includes(searchTerm));
+        currentProducts = initialProducts.filter(prod => prod.nome.toLowerCase().includes(searchTerm));
         currentPage = 1;
         renderProductsAndPagination();
     });
@@ -373,6 +375,6 @@ function renderOrderTable() {
     document.getElementById('btnCancelOrder').addEventListener('click', () => { if (confirm("Tem certeza que deseja cancelar este pedido e limpar a comanda?")) { orderItems = []; renderOrderTable(); updateOrderSummary(); discountInput.value = 0; } });
     
     // --- INICIALIZAÇÃO ---
-    renderProductsAndPagination();
+	renderProductsAndPagination();
     renderOrderTable();
 });

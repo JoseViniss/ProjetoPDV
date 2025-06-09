@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Produto - PDV FOOD</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/produto.css}"/>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const formCadastroProduto = document.getElementById('formCadastroProduto');
+
+    formCadastroProduto.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const produtoData = {
+        nome: document.getElementById('nome').value,
+        valor_venda: parseFloat(document.getElementById('valor_venda').value),
+        imagem_produto: document.getElementById('imagem_produto').value
+      };
+	  
+	  console.log('Enviando para o backend:', produtoData);
+
+      fetch('/cadastro/produto/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(produtoData),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro na requisição: ' + response.statusText);
+        }
+        return response.json(); // Se o backend não retornar JSON, remova esta linha
+      })
+      .then(data => {
+        alert('Produto cadastrado com sucesso!');
+        formCadastroProduto.reset();
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao cadastrar o produto.');
+      });
+    });
+  });
+  </script>
+
+  
+</head>
+<body>
+  <!-- NAVBAR SUPERIOR -->
+  <nav class="navbar navbar-light bg-white px-3 shadow-sm">
+      <a href="/" class="link-offset-2 link-underline link-underline-opacity-0"><span class="navbar-brand mb-0 h1 text-primary"><strong>PDV FOOD</strong></span></a>
+      <div class="d-flex align-items-center gap-3 dropstart">
+        <img th:src="${imagem}" class="usuario_imagem rounded-circle" alt="Usuário"  type="button" data-bs-toggle="dropdown" aria-expanded="false">
+  	  	<ul class="dropdown-menu">
+  	      <li><a class="dropdown-item" href="/sair">Sair</a></li>
+  	    </ul>
+  		<i class="bi bi-bell-fill text-primary fs-5"></i>
+  	  </div>
+    </nav>
+
+  <!-- CONTEÚDO -->
+  <div class="d-flex main-container">
+      <div class="sidebar bg-dark text-white d-flex flex-column align-items-center py-4">
+        <a href="/"><div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-house-door-fill"></i></div></a>
+        <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-card-list"></i></div>
+        <a href="/cadastro/produto"><div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-box-seam"></i></div></a>
+        <div class="nav-icon mb-4 text-primary fs-3"><i class="bi bi-gear-fill"></i></div>
+   </div>
+
+    <!-- FORMULÁRIO -->
+    <main class="flex-grow-1 p-4 bg-light">
+      <div class="container bg-white rounded shadow-sm p-4">
+        <h3 class="text-primary mb-4">Cadastro de Produto</h3>
+		<form id="formCadastroProduto">
+		  <div class="mb-3">
+		    <label for="nome" class="form-label fw-bold">Nome do Produto</label>
+		    <input type="text" class="form-control" id="nome" placeholder="Ex: X-Burguer" required/>
+		  </div>
+
+		  <div class="mb-3">
+		    <label for="valor_venda" class="form-label fw-bold">Valor de Venda (R$)</label>
+		    <input type="number" class="form-control" id="valor_venda" placeholder="Ex: 25.90" step="0.01" required/>
+		  </div>
+
+		  <div class="mb-3">
+		    <label for="imagem_produto" class="form-label fw-bold">Link da Imagem</label>
+		    <input type="url" class="form-control" id="imagem_produto" placeholder="https://..." required />
+		  </div>
+
+		  <div class="text-end">
+		    <button type="reset" class="btn btn-outline-secondary me-2">Limpar</button>
+		    <button type="submit" class="btn btn-primary">Cadastrar Produto</button>
+		  </div>
+		</form>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
