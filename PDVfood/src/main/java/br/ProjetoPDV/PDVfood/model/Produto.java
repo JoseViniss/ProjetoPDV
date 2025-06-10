@@ -8,7 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Produto {
@@ -20,7 +22,8 @@ public class Produto {
 	@NotEmpty
 	private String nome;
 	
-	@NotEmpty
+	@NotNull(message = "O valor de venda não pode ser nulo.")
+	@DecimalMin(value = "0.01", message = "O valor de venda deve ser maior que zero.")
 	private BigDecimal valor_venda;
 	
 	@NotEmpty

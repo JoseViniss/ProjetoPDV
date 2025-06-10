@@ -23,7 +23,7 @@
 	  
 	  console.log('Enviando para o backend:', produtoData);
 
-      fetch('/cadastro/produto/save', {
+      fetch('/produto/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,8 +84,39 @@
 
 		  <div class="mb-3">
 		    <label for="valor_venda" class="form-label fw-bold">Valor de Venda (R$)</label>
-		    <input type="number" class="form-control" id="valor_venda" placeholder="Ex: 25.90" step="0.01" required/>
+		    <input type="text" class="form-control" id="valor_venda" step="0.01" value="0.00" required/>
 		  </div>
+		  
+		  <script>
+		      const campoValor = document.getElementById("valor_venda");
+
+		      campoValor.addEventListener("input", (e) => {
+		        let valor = e.target.value;
+
+		        // Remove tudo que não for número
+		        valor = valor.replace(/\D/g, "");
+
+		        // Converte para centavos (ex: 123456 -> 1234,56)
+		        valor = (parseInt(valor, 10) / 100).toFixed(2);
+
+		        // Atualiza o campo com o valor formatado
+		        e.target.value = valor;
+		      });
+
+		      // Garante que o campo sempre tenha o valor padrão ao focar
+		      campoValor.addEventListener("focus", () => {
+		        if (campoValor.value === "") {
+		          campoValor.value = "0.00";
+		        }
+		      });
+
+		      // Impede que o campo fique vazio
+		      campoValor.addEventListener("blur", () => {
+		        if (campoValor.value === "") {
+		          campoValor.value = "0,00";
+		        }
+		      });
+		    </script>
 
 		  <div class="mb-3">
 		    <label for="imagem_produto" class="form-label fw-bold">Link da Imagem</label>

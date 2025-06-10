@@ -1,5 +1,3 @@
-// Crie um novo arquivo ou adicione a um controller de API existente
-
 package br.ProjetoPDV.PDVfood.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
-	
-    let currentProducts = [...initialProducts];
-    let selectedProduct = null;
-    let orderItems = [];
-    const productsPerPage = 6;
-    let currentPage = 1;
-    let totalPayableValue = 0; // Armazena o valor total a ser pago
+'use strict';
 
-    // Mapeamento de todos os elementos do DOM (sem alterações, apenas os novos abaixo)
+document.addEventListener('DOMContentLoaded', () => {
+
+    // =========================================================================
+    // 1. DECLARAÇÃO DE VARIÁVEIS E ELEMENTOS DO DOM
+    // =========================================================================
+    
+    // Elementos do Painel de Produtos
     const productContainer = document.getElementById("productContainer");
     const paginationControls = document.getElementById("paginationControls");
     const searchInput = document.getElementById('searchInput');
@@ -15,16 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const increaseQuantityButton = document.getElementById('increaseQuantity');
     const itemQuantityInput = document.getElementById('itemQuantity');
     const btnAddSelectedItemToOrder = document.getElementById('btnAddSelectedItemToOrder');
+    const btnAddByCode = document.getElementById('btnAddByCode');
+    const inputCodigoProduto = document.getElementById('inputCodigoProduto');
+    
+    // Elementos da Comanda (Painel Direito)
     const orderTableBody = document.getElementById('orderTableBody');
     const totalItemsCountEl = document.getElementById('totalItemsCount');
     const orderSubtotalEl = document.getElementById('orderSubtotal');
     const discountInput = document.getElementById('discountInput');
     const totalPayableEl = document.getElementById('totalPayable');
-    const btnAddByCode = document.getElementById('btnAddByCode');
-    const inputCodigoProduto = document.getElementById('inputCodigoProduto');
     const btnGoToPayment = document.getElementById('btnGoToPayment');
+    const btnCancelOrder = document.getElementById('btnCancelOrder');
     
-    // Novos elementos do Modal de Pagamento
+    // Elementos do Modal de Pagamento
     const paymentModalEl = document.getElementById('paymentModal');
     const paymentModalTotalEl = document.getElementById('paymentModalTotal');
     const cashPaymentDetailsEl = document.getElementById('cashPaymentDetails');
@@ -32,9 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const trocoCalculadoEl = document.getElementById('trocoCalculado');
     const btnFinalizarVenda = document.getElementById('btnFinalizarVenda');
 
+    // Elementos do Modal de Cliente
+    const selectCliente = document.getElementById('selectCliente');
+    const formAddClient = document.getElementById('formAddClient');
+    const addClientModal = document.getElementById('addClientModal');
+
+    // Variáveis de Estado da Aplicação
+    let currentProducts = [...initialProducts];
+    let selectedProduct = null;
+    let orderItems = [];
+    const productsPerPage = 6;
+    let currentPage = 1;
+    let totalPayableValue = 0;
+
+    // =========================================================================
+    // 2. FUNÇÕES PRINCIPAIS DA APLICAÇÃO
+    // =========================================================================
 
     function formatCurrency(value) {
-        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     function renderProducts() {
@@ -43,15 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const startIndex = (currentPage - 1) * productsPerPage;
         const endIndex = startIndex + productsPerPage;
         const paginatedProducts = currentProducts.slice(startIndex, endIndex);
+
         if (paginatedProducts.length === 0) {
             productContainer.innerHTML = `<div class="col-12 text-center text-muted p-5">Nenhum produto encontrado.</div>`;
             return;
         }
+
         paginatedProducts.forEach(prod => {
             const col = document.createElement("div");
             col.className = "col-6 col-md-4 col-lg-4 mb-3";
             const card = document.createElement("div");
-            card.className = "card product-card";
+            card.className = "card product-card h-100";
             card.dataset.productId = prod.id;
             card.innerHTML = `<img src="${prod.imagem_produto}" class="card-img-top" alt="${prod.nome}"><div class="card-body"><h5 class="product-name">${prod.id} - ${prod.nome}</h5><p class="product-price">${formatCurrency(prod.valor_venda)}</p></div>`;
             card.addEventListener("click", () => {
@@ -79,10 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.innerHTML = content;
             a.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (!isDisabled) {
-                    currentPage = page;
-                    renderProductsAndPagination();
-                }
+                if (!isDisabled) { currentPage = page; renderProductsAndPagination(); }
             });
             li.appendChild(a);
             return li;
@@ -101,9 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function addProductToOrder(product, quantity) {
         if (!product || quantity < 1) return;
-        const existingItemIndex = orderItems.findIndex(item => item.id === product.id);
-        if (existingItemIndex > -1) {
-            orderItems[existingItemIndex].quantity += quantity;
+        const existingItem = orderItems.find(item => item.id === product.id);
+        if (existingItem) {
+            existingItem.quantity += quantity;
         } else {
             orderItems.push({ ...product, quantity });
         }
@@ -111,74 +128,30 @@ document.addEventListener('DOMContentLoaded', () => {
         updateOrderSummary();
     }
 
-	function renderOrderTable() {
-    orderTableBody.innerHTML = "";
-
-    if (orderItems.length === 0) {
-        orderTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-4">Nenhum item na comanda.</td></tr>`;
-        updateOrderSummary(); 
-        return;
+    function renderOrderTable() {
+        orderTableBody.innerHTML = "";
+        if (orderItems.length === 0) {
+            orderTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-4">Nenhum item na comanda.</td></tr>`;
+            updateOrderSummary(); 
+            return;
+        }
+        orderItems.forEach((item, index) => {
+            const subtotal = item.valor_venda * item.quantity;
+            const row = orderTableBody.insertRow();
+            row.innerHTML = `
+                <td>${item.nome}</td>
+                <td class="text-end">${formatCurrency(item.valor_venda)}</td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm quantity-input-comanda" value="${item.quantity}" min="1" data-index="${index}">
+                </td>
+                <td class="text-end fw-medium subtotal-cell">${formatCurrency(subtotal)}</td>
+                <td class="text-center">
+                    <button class="btn btn-outline-danger btn-sm btn-delete-item" data-index="${index}" title="Remover item"><i class="bi bi-trash3"></i></button>
+                </td>
+            `;
+        });
+        updateOrderSummary();
     }
-
-    // Cria uma linha para cada item na comanda
-    orderItems.forEach((item, index) => {
-        const subtotal = item.valor_venda * item.quantity;
-        const row = orderTableBody.insertRow();
-        
-        // Esta é a parte que cria o HTML da linha, incluindo o campo de input
-        row.innerHTML = `
-            <td>${item.nome}</td>
-            <td class="text-end">${formatCurrency(item.valor_venda)}</td>
-            <td class="text-center">
-                <input 
-                    type="number" 
-                    class="form-control form-control-sm quantity-input-comanda" 
-                    value="${item.quantity}" 
-                    min="1" 
-                    data-index="${index}"
-                >
-            </td>
-            <td class="text-end fw-medium subtotal-cell">${formatCurrency(subtotal)}</td>
-            <td class="text-center">
-                <button class="btn btn-outline-danger btn-sm btn-delete-item" data-index="${index}" title="Remover item">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </td>
-        `;
-    });
-    
-    // Adiciona o evento de clique para os botões de deletar
-    document.querySelectorAll('.btn-delete-item').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemIndex = parseInt(this.dataset.index);
-            orderItems.splice(itemIndex, 1);
-            renderOrderTable(); // Redesenha a tabela após remover um item
-        });
-    });
-
-    // Adiciona o evento de input para os campos de quantidade
-    document.querySelectorAll('.quantity-input-comanda').forEach(input => {
-        input.addEventListener('input', function() {
-            const index = parseInt(this.dataset.index);
-            let newQuantity = parseInt(this.value);
-
-            if (isNaN(newQuantity) || newQuantity < 1) {
-                newQuantity = 1;
-                this.value = 1;
-            }
-            
-            orderItems[index].quantity = newQuantity;
-
-            const item = orderItems[index];
-            const newSubtotal = item.valor_venda * newQuantity;
-            const row = this.closest('tr');
-            const subtotalCell = row.querySelector('.subtotal-cell');
-            subtotalCell.textContent = formatCurrency(newSubtotal);
-
-            updateOrderSummary();
-        });
-    });
-}
 
     function updateOrderSummary() {
         let itemsCount = 0;
@@ -194,187 +167,177 @@ document.addEventListener('DOMContentLoaded', () => {
         orderSubtotalEl.textContent = formatCurrency(subtotal);
         totalPayableEl.textContent = formatCurrency(totalPayableValue);
     }
-    
-    // --- LÓGICA DO MODAL DE PAGAMENTO ---
-
-    // Abre o modal e atualiza o valor a pagar
-    btnGoToPayment.addEventListener('click', () => {
-        if (orderItems.length === 0) {
-            // Previne a abertura do modal se a comanda estiver vazia
-            const paymentModal = bootstrap.Modal.getInstance(paymentModalEl);
-            if(paymentModal) paymentModal.hide(); // Garante que está escondido
-            alert("Adicione itens à comanda antes de prosseguir para o pagamento.");
-            // Impede o toggle do Bootstrap
-            event.stopImmediatePropagation();
-        } else {
-            paymentModalTotalEl.textContent = formatCurrency(totalPayableValue);
-            // Reseta o modal para o estado inicial toda vez que é aberto
-            cashPaymentDetailsEl.style.display = 'none';
-            valorRecebidoInput.value = '';
-            trocoCalculadoEl.textContent = formatCurrency(0);
-            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
-        }
-    });
-
-    // Controla a exibição dos detalhes de pagamento em dinheiro
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.addEventListener('change', (event) => {
-            if (event.target.value === 'dinheiro') {
-                cashPaymentDetailsEl.style.display = 'block';
-            } else {
-                cashPaymentDetailsEl.style.display = 'none';
-            }
-        });
-    });
-
-    // Calcula o troco em tempo real
-    valorRecebidoInput.addEventListener('input', () => {
-        const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
-        const troco = valorRecebido - totalPayableValue;
-        
-        if(valorRecebido === 0) {
-             trocoCalculadoEl.textContent = formatCurrency(0);
-        } else {
-             trocoCalculadoEl.textContent = formatCurrency(troco);
-        }
-
-        if(troco < 0) {
-            trocoCalculadoEl.classList.remove('text-info');
-            trocoCalculadoEl.classList.add('text-danger');
-        } else {
-            trocoCalculadoEl.classList.remove('text-danger');
-            trocoCalculadoEl.classList.add('text-info');
-        }
-    });
-
-    // Finaliza a venda
-    btnFinalizarVenda.addEventListener('click', () => {
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-        if (!selectedPaymentMethod) {
-            alert("Por favor, selecione uma forma de pagamento.");
-            return;
-        }
-
-        // Validação para pagamento em dinheiro
-        if (selectedPaymentMethod.value === 'dinheiro') {
-            const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
-            if (valorRecebido < totalPayableValue) {
-                alert("O valor recebido é menor que o total a pagar.");
-                return;
-            }
-        }
-        
-        // Simulação de finalização
-        alert(`Venda finalizada com sucesso! \nMétodo de Pagamento: ${selectedPaymentMethod.value.toUpperCase()}`);
-        
-        // Resetar o estado da aplicação para uma nova venda
-        resetApplicationState();
-    });
-
-    // Modal Cliente
-
-		formAddClient.addEventListener('submit', (event) => {
-		    event.preventDefault(); // ESSENCIAL: Impede o envio padrão do formulário
-
-		    // Monta o objeto com os dados do cliente
-		    const clienteData = {
-		        nome: document.getElementById('nome').value,
-		        telefone: document.getElementById('telefone').value,
-		        email: document.getElementById('email').value,
-		        cep: document.getElementById('cep').value,
-		        rua: document.getElementById('rua').value,
-		        bairro: document.getElementById('bairro').value,
-		        cidade: document.getElementById('cidade').value,
-		        uf: document.getElementById('uf').value
-		    };
-
-		    // Lógica do fetch para a API
-		    fetch('/save/cliente', {
-		        method: 'POST',
-		        headers: {
-		            'Content-Type': 'application/json',
-		        },
-		        body: JSON.stringify(clienteData),
-		    })
-		    .then(response => {
-		        if (!response.ok) {
-		            throw new Error('Falha na resposta da rede: ' + response.statusText);
-		        }
-		        return response.json();
-		    })
-		    .then(novoCliente => {
-		        // Sucesso!
-		        const newOption = new Option(novoCliente.nome, novoCliente.id, false, true);
-		        selectCliente.add(newOption);
-		        selectCliente.value = novoCliente.id;
-
-		        const clientModal = bootstrap.Modal.getInstance(addClientModal);
-		        clientModal.hide();
-		        formAddClient.reset();
-		        alert('Cliente cadastrado com sucesso via AJAX!');
-		    })
-		    .catch(error => {
-		        console.error('Erro ao cadastrar cliente:', error);
-		        alert('Ocorreu um erro ao cadastrar o cliente. Verifique o console para mais detalhes.');
-		    });
-		});
-
 
     function resetApplicationState() {
-        // Fecha o modal de pagamento
         const paymentModalInstance = bootstrap.Modal.getInstance(paymentModalEl);
         if(paymentModalInstance) paymentModalInstance.hide();
-        
-        // Limpa a comanda
         orderItems = [];
-        renderOrderTable();
-        updateOrderSummary();
-
-        // Reseta campos
         discountInput.value = 0;
-        document.getElementById('selectCliente').value = 0;
-
-        // Reseta a busca e a paginação de produtos
+        selectCliente.value = 0;
         searchInput.value = '';
         currentProducts = [...initialProducts];
         currentPage = 1;
+        renderOrderTable();
         renderProductsAndPagination();
     }
 
-    // --- EVENT LISTENERS GERAIS (sem alterações) ---
+    // =========================================================================
+    // 3. EVENT LISTENERS (OUVINTES DE EVENTOS)
+    // =========================================================================
+
+    // --- Painel de Produtos ---
     searchInput.addEventListener('keyup', () => {
         const searchTerm = searchInput.value.toLowerCase();
         currentProducts = initialProducts.filter(prod => prod.nome.toLowerCase().includes(searchTerm));
         currentPage = 1;
         renderProductsAndPagination();
     });
+
     decreaseQuantityButton.addEventListener('click', () => { if (parseInt(itemQuantityInput.value) > 1) itemQuantityInput.value = parseInt(itemQuantityInput.value) - 1; });
     increaseQuantityButton.addEventListener('click', () => { itemQuantityInput.value = parseInt(itemQuantityInput.value) + 1; });
     btnAddSelectedItemToOrder.addEventListener('click', () => { if (selectedProduct) { addProductToOrder(selectedProduct, parseInt(itemQuantityInput.value)); const card = productContainer.querySelector('.product-card.selected'); if(card) card.classList.remove('selected'); selectedProduct = null; itemQuantityInput.value = 1; } else { alert("Por favor, selecione um produto da lista."); } });
-    
     btnAddByCode.addEventListener('click', () => {
-    const input = inputCodigoProduto.value.trim();
-    if (!input) return;
+        const id = parseInt(inputCodigoProduto.value.trim());
+        if (isNaN(id)) return alert("Por favor, insira um ID numérico válido.");
+        const product = initialProducts.find(p => p.id === id);
+        if (product) { addProductToOrder(product, 1); inputCodigoProduto.value = ""; } else { alert(`Produto com ID "${id}" não encontrado.`); }
+    });
 
-    const id = parseInt(input);
-    if (isNaN(id)) {
-        alert("Por favor, insira um ID numérico válido.");
-        return;
-    }
-
-    const product = initialProducts.find(p => p.id === id);
-    if (product) {
-        addProductToOrder(product, 1);
-        inputCodigoProduto.value = "";
-    } else {
-        alert(`Produto com ID "${id}" não encontrado.`);
-    }
+    // --- Painel da Comanda ---
+    // APLICAÇÃO DE EVENT DELEGATION: Um listener para a tabela inteira
+    orderTableBody.addEventListener('click', function(event) {
+        const deleteButton = event.target.closest('.btn-delete-item');
+        if (deleteButton) {
+            const itemIndex = parseInt(deleteButton.dataset.index);
+            orderItems.splice(itemIndex, 1);
+            renderOrderTable();
+        }
+    });
+    orderTableBody.addEventListener('input', function(event) {
+        const quantityInput = event.target.closest('.quantity-input-comanda');
+        if (quantityInput) {
+            const index = parseInt(quantityInput.dataset.index);
+            let newQuantity = parseInt(quantityInput.value);
+            if (isNaN(newQuantity) || newQuantity < 1) { newQuantity = 1; quantityInput.value = 1; }
+            orderItems[index].quantity = newQuantity;
+            const item = orderItems[index];
+            const newSubtotal = item.valor_venda * newQuantity;
+            const row = quantityInput.closest('tr');
+            row.querySelector('.subtotal-cell').textContent = formatCurrency(newSubtotal);
+            updateOrderSummary();
+        }
     });
 
     discountInput.addEventListener('input', updateOrderSummary);
-    document.getElementById('btnCancelOrder').addEventListener('click', () => { if (confirm("Tem certeza que deseja cancelar este pedido e limpar a comanda?")) { orderItems = []; renderOrderTable(); updateOrderSummary(); discountInput.value = 0; } });
-    
-    // --- INICIALIZAÇÃO ---
-	renderProductsAndPagination();
+    btnCancelOrder.addEventListener('click', () => { if (confirm("Tem certeza que deseja cancelar este pedido?")) { resetApplicationState(); } });
+
+    // --- Modal de Pagamento ---
+    btnGoToPayment.addEventListener('click', (event) => {
+        if (orderItems.length === 0) {
+            alert("Adicione itens à comanda antes de prosseguir.");
+            event.stopImmediatePropagation();
+            return;
+        }
+        paymentModalTotalEl.textContent = formatCurrency(totalPayableValue);
+        cashPaymentDetailsEl.style.display = 'none';
+        valorRecebidoInput.value = '';
+        trocoCalculadoEl.textContent = formatCurrency(0);
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
+    });
+
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+        radio.addEventListener('change', (event) => {
+            cashPaymentDetailsEl.style.display = event.target.value === 'dinheiro' ? 'block' : 'none';
+        });
+    });
+
+    valorRecebidoInput.addEventListener('input', () => {
+        const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
+        const troco = valorRecebido - totalPayableValue;
+        trocoCalculadoEl.textContent = formatCurrency(troco);
+        trocoCalculadoEl.classList.toggle('text-danger', troco < 0);
+        trocoCalculadoEl.classList.toggle('text-info', troco >= 0);
+    });
+
+    // CORRIGIDO E UNIFICADO: Listener para finalizar a venda
+    btnFinalizarVenda.addEventListener('click', () => {
+        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+        if (!selectedPaymentMethod) return alert("Por favor, selecione uma forma de pagamento.");
+        if (selectedPaymentMethod.value === 'dinheiro') {
+            const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
+            if (valorRecebido < totalPayableValue) return alert("O valor recebido é menor que o total a pagar.");
+        }
+
+        const itensParaEnviar = orderItems.map(item => ({ produto_id: item.id, quantidade_vendido: item.quantity }));
+        const vendaData = {
+            cliente_id: selectCliente.value,
+            itens: itensParaEnviar
+        };
+
+        console.log("Enviando para o backend:", vendaData);
+
+        fetch('/vendas/cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(vendaData),
+        })
+        .then(response => {
+            if (!response.ok) return response.json().then(err => { throw new Error(err.message || 'Falha ao registrar a venda.'); });
+            return response.json();
+        })
+        .then(vendaSalva => {
+            alert('Venda #' + vendaSalva.id + ' finalizada com sucesso!');
+            resetApplicationState(); 
+        })
+        .catch(error => {
+            console.error('Erro ao finalizar a venda:', error);
+            alert('Não foi possível registrar a venda. Erro: ' + error.message);
+        });
+    });
+
+    // --- Modal de Cliente ---
+    if (formAddClient) {
+        formAddClient.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const clienteData = {
+                nome: document.getElementById('nome').value,
+                telefone: document.getElementById('telefone').value,
+                email: document.getElementById('email').value,
+                cep: document.getElementById('cep').value,
+                rua: document.getElementById('rua').value,
+                bairro: document.getElementById('bairro').value,
+                cidade: document.getElementById('cidade').value,
+                uf: document.getElementById('uf').value
+            };
+
+            fetch('/save/cliente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clienteData),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Falha na resposta da rede: ' + response.statusText);
+                return response.json();
+            })
+            .then(novoCliente => {
+                const newOption = new Option(novoCliente.nome, novoCliente.id, false, true);
+                selectCliente.add(newOption);
+                selectCliente.value = novoCliente.id;
+                const clientModal = bootstrap.Modal.getInstance(addClientModal);
+                clientModal.hide();
+                formAddClient.reset();
+                alert('Cliente cadastrado com sucesso!');
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar cliente:', error);
+                alert('Ocorreu um erro ao cadastrar o cliente.');
+            });
+        });
+    }
+
+    // =========================================================================
+    // 4. INICIALIZAÇÃO DA PÁGINA
+    // =========================================================================
+    renderProductsAndPagination();
     renderOrderTable();
 });
