@@ -44,4 +44,13 @@ public class HomeController {
 		
 		return "cadastro_produto";
 	}
+	
+	@GetMapping("vendas/lancadas")
+	public String paginaVendas(Model model, HttpServletRequest request) throws UnsupportedEncodingException{
+		
+		model.addAttribute("nome",CookieService.getCookie(request, "nomeUsuario"));
+		model.addAttribute("imagem",CookieService.getCookie(request, "imagemUsuario"));
+		
+		return "vendas";
+	}
 }

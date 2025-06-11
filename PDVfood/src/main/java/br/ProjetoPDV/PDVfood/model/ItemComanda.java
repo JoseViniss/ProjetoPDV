@@ -2,6 +2,8 @@ package br.ProjetoPDV.PDVfood.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +35,7 @@ public class ItemComanda {
 	@DecimalMin(value = "0.01", message = "O valor de venda deve ser maior que zero.")
 	private BigDecimal sub_total;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "venda_id", nullable = false)
 	private Venda venda;

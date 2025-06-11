@@ -1,0 +1,72 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.main-container {
+    height: calc(100vh - 56px); /* 56px é a altura da navbar */
+}
+
+/* Estilo para os itens da lista de vendas (Accordion) */
+.accordion-item {
+    border: none;
+    border-radius: 0.5rem !important;
+    margin-bottom: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.accordion-item:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.accordion-button {
+    border-radius: 0.5rem !important;
+    font-weight: 500;
+    color: #212529;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.sale-summary-item {
+    font-size: 0.9rem;
+}
+
+/* Tabela de produtos dentro do accordion */
+.table-details th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.table-details td {
+    font-size: 0.9rem;
+}
+
+.sidebar {
+  width: 80px;
+  min-height: 100vh;
+}
+
+.nav-icon i {
+  color: #8e9aa6;
+}
+.nav-icon:hover i {
+  color: #fff;
+}
+.nav-icon:hover {
+  background-color: #343a40;
+}
+
+.usuario-imagem {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}

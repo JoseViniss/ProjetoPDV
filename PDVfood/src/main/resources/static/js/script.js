@@ -260,41 +260,67 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // CORRIGIDO E UNIFICADO: Listener para finalizar a venda
-    btnFinalizarVenda.addEventListener('click', () => {
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-        if (!selectedPaymentMethod) return alert("Por favor, selecione uma forma de pagamento.");
-        if (selectedPaymentMethod.value === 'dinheiro') {
-            const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
-            if (valorRecebido < totalPayableValue) return alert("O valor recebido é menor que o total a pagar.");
-        }
+	// Substitua sua função 'btnFinalizarVenda' por esta:
 
-        const itensParaEnviar = orderItems.map(item => ({ produto_id: item.id, quantidade_vendido: item.quantity }));
-        const vendaData = {
-            cliente_id: selectCliente.value,
-            itens: itensParaEnviar
-        };
+	btnFinalizarVenda.addEventListener('click', () => {
+	    // 1. Manter as validações iniciais que você já tem
+	    if (orderItems.length === 0) {
+	        alert("A comanda está vazia. Adicione itens antes de finalizar.");
+	        return;
+	    }
 
-        console.log("Enviando para o backend:", vendaData);
+	    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+	    if (!selectedPaymentMethod) {
+	        alert("Por favor, selecione uma forma de pagamento.");
+	        return;
+	    }
 
-        fetch('/vendas/cadastro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(vendaData),
-        })
-        .then(response => {
-            if (!response.ok) return response.json().then(err => { throw new Error(err.message || 'Falha ao registrar a venda.'); });
-            return response.json();
-        })
-        .then(vendaSalva => {
-            alert('Venda #' + vendaSalva.id + ' finalizada com sucesso!');
-            resetApplicationState(); 
-        })
-        .catch(error => {
-            console.error('Erro ao finalizar a venda:', error);
-            alert('Não foi possível registrar a venda. Erro: ' + error.message);
-        });
-    });
+	    if (selectedPaymentMethod.value === 'dinheiro') {
+	        const valorRecebido = parseFloat(valorRecebidoInput.value) || 0;
+	        if (valorRecebido < totalPayableValue) {
+	            alert("O valor recebido é menor que o total a pagar.");
+	            return;
+	        }
+	    }
 
+	    const itensParaEnviar = orderItems.map(item => {
+	        return {
+	            produtoId: item.id,
+	            quantidade: item.quantity
+	        };
+	    });
+	    
+	    const vendaData = {
+	        clienteId: document.getElementById('selectCliente').value, // Pega o ID do cliente selecionado
+	        itens: itensParaEnviar
+	    };
+
+	    console.log("Enviando para o backend:", vendaData);
+
+	    fetch('/vendas/cadastro', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json',
+	        },
+	        body: JSON.stringify(vendaData),
+	    })
+	    .then(response => {
+	        if (!response.ok) {
+	            return response.json().then(err => { 
+	                throw new Error(err.message || 'Falha ao registrar a venda.'); 
+	            });
+	        }
+	        return response.json();
+	    })
+	    .then(vendaSalva => {
+	        alert('Venda #' + vendaSalva.id + ' finalizada com sucesso!');
+	        resetApplicationState(); 
+	    })
+	    .catch(error => {
+	        console.error('Erro ao finalizar a venda:', error);
+	        alert('Não foi possível registrar a venda. Erro: ' + error.message);
+	    });
+	});
     // --- Modal de Cliente ---
     if (formAddClient) {
         formAddClient.addEventListener('submit', (event) => {
